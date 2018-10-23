@@ -56,6 +56,7 @@ chmod a+x $mico_path
 
 # 检查自启动脚本是否存在
 if [ ! -f "${mico_initpath}" ];then
+  echo "部署启动脚本"
   echo "#!/bin/sh /etc/rc.common
 START=96
 start() {
