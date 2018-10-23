@@ -54,10 +54,9 @@ awk '{gsub("^keywords_update_timeout=.*", "keywords_update_timeout='${keywords_u
 awk '{gsub("^nodered_url=.*", "nodered_url=\"'${nodered_url}'\""); print $0}' > $mico_path
 chmod a+x $mico_path
 
-# 检查自启动脚本是否存在
-if [ ! -f "${mico_initpath}" ];then
-  echo "部署启动脚本"
-  echo "#!/bin/sh /etc/rc.common
+# 部署脚本
+echo "部署启动脚本"
+echo "#!/bin/sh /etc/rc.common
 START=96
 start() {
   sh '${mico_path}' &
@@ -66,12 +65,9 @@ start() {
 stop() {
   kill \`ps|grep 'sh ${mico_path}'|grep -v grep|awk '{print \$1}'\`
 }" > $mico_initpath
-  chmod a+x $mico_initpath
-  # 建立软连接
-  ln -sf $mico_initpath $mico_rcpath
-else
-  echo "启动脚本已存在,忽略"
-fi
+chmod a+x $mico_initpath
+# 建立软连接
+ln -sf $mico_initpath $mico_rcpath
 
 echo "安装完毕"
 echo "可以使用/etc/init.d/mico_enable start 启动小爱拦截器"
