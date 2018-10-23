@@ -68,5 +68,11 @@ stop() {
   chmod a+x $mico_initpath
   # 建立软连接
   ln -sf $mico_initpath $mico_rcpath
+else
+  echo "启动脚本已存在,忽略"
 fi
+
+echo "安装完毕"
+echo "可以使用/etc/init.d/mico_enable start 启动小爱拦截器"
+echo "可以使用/etc/init.d/mico_enable stop 停止小爱拦截器"
 
