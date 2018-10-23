@@ -63,7 +63,7 @@ start() {
 }
 
 stop() {
-  kill \`ps|grep 'sh ${mico_path}'|grep -v grep|awk '{print $1}'\`
+  kill \`ps|grep 'sh ${mico_path}'|grep -v grep|awk '{print \$1}'\`
 }" > $mico_initpath
   chmod a+x $mico_initpath
   # 建立软连接
