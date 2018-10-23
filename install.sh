@@ -15,7 +15,7 @@ echo "把拦截的请求转发给NodeRed服务进行自定义设备的操作"
 echo ""
 
 # 环境检测,必须为小爱环境才继续
-# [ -z "`uname -a|grep mico`" ] && echo "\033[33m当前不是小爱设备,请到小爱上执行此命令\033[0m";exit
+[ -z "`uname -a|grep mico`" ] && echo "\033[33m当前不是小爱设备,请到小爱上执行此命令\033[0m";exit
 
 echo "请输入响应拦截词,多个拦截词使用|分割,默认值为[\033[37m未知|没有\033[0m]:"
 read -p "" keywords
@@ -38,7 +38,7 @@ echo ""
 echo "==============================================================="
 
 echo "以上信息是否正确？任意键继续安装,ctrl+c取消安装:"
-# read -p "" enterkey
+read -p "" enterkey
 
 # 下载远程脚本并检查是否成功
 mico=`curl -s 'https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh'`
