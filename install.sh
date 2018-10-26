@@ -9,7 +9,7 @@ mico_initpath="${root}/etc/init.d/mico_enable"
 mico_tmppath="/tmp"
 rm $mico_initpath
 echo ""
-echo "欢迎使用'小爱拦截器'安装工具 v0.2(2018.10.26)"
+echo "欢迎使用'小爱拦截器'安装工具 v0.3(2018.10.26)"
 echo ""
 echo "本工具通过拦截小爱的识别词和响应词"
 echo "把拦截的请求转发给NodeRed服务进行自定义设备的操作"
@@ -50,7 +50,7 @@ read -p "" enterkey
 
 echo "开始验证nodered访问是否通畅"
 echo ""
-header=`curl –connect-timeout 2 -m 4 -sI -u ${nodered_auth} ${nodered_url}`
+header=`curl –connect-timeout 2 -m 4 -sI -u "${nodered_auth}" ${nodered_url}`
 if [ -z "`echo ${header}`" ];then
   echo "验证不通过: NodeRed网址不通"
   exit
@@ -79,7 +79,7 @@ fi
 
 
 # 下载远程脚本并检查是否成功
-mico=`curl -s 'https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh'`
+mico=`curl -s –connect-timeout 4 -m 4 'https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh'`
 # mico=`cat ./mico.sh`
 if [[ -z `echo "${mico}"|awk 'match($0,/VERSION/){print 1}'` ]];then
   echo "脚本下载不成功,可能你需要买个番茄先"
