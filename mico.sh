@@ -1,6 +1,6 @@
 # @author FlashSoft
-# @update 2018.10.19
-VERSION="0.0.4"
+# @update 2018.10.26
+VERSION="0.0.5"
 # == 自定义配置 ==============================================
 # 设定拦截词,以竖线分割每个拦截词,被拦截的内容会转发给nodered服务器进行处理
 keywords="没有|未知"
@@ -14,6 +14,7 @@ keywords_update_timeout=0
  
 asr_file="/tmp/mibrain/mibrain_asr.log"
 res_file="/tmp/mibrain/mibrain_response.log"
+nodered_auth=":"
  
 # 解决可能存在第一次文件不存在问题
 touch $res_file && touch $asr_file
@@ -64,7 +65,7 @@ while true;do
       # @todo:
       # 转发asr和res给服务端接口,远端可以处理控制逻辑完成后返回需要播报的TTS文本
       # 2秒连接超时,4秒传输超时
-      tts=`curl $nodered_url –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content"`
+      tts=`curl $nodered_url -u $nodered_password –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content"`
       echo "== 请求完成 ======"
  
       # 如果远端返回内容不为空则用TTS播报之
@@ -93,7 +94,7 @@ while true;do
     # echo $step
     # 根据设定时间间隔获取更新词
     if [[ "$step" -gt "$keywords_update_timeout" ]];then
-        keywords=`curl $nodered_url –connect-timeout 2 -m 4 -s`
+        keywords=`curl $nodered_url -u $nodered_password –connect-timeout 2 -m 4 -s`
         echo "== 更新关键词 ======"
         echo $keywords
         last_time=`date +%s`
