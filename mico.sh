@@ -67,6 +67,7 @@ while true;do
       # 2秒连接超时,4秒传输超时
       tts=`curl -u "$nodered_password" –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content" $nodered_url`
       echo "== 请求完成 ======"
+      echo "$tts"
  
       # 如果远端返回内容不为空则用TTS播报之
       if [[ -n "$tts" ]];then
