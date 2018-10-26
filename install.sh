@@ -9,7 +9,7 @@ mico_initpath="${root}/etc/init.d/mico_enable"
 mico_tmppath="/tmp"
 rm $mico_initpath
 echo ""
-echo "欢迎使用'小爱拦截器'安装工具 v0.3(2018.10.26)"
+echo "欢迎使用'小爱拦截器'安装工具 v0.4(2018.10.26)"
 echo ""
 echo "本工具通过拦截小爱的识别词和响应词"
 echo "把拦截的请求转发给NodeRed服务进行自定义设备的操作"

@@ -1,6 +1,6 @@
 # @author FlashSoft
 # @update 2018.10.26
-VERSION="0.0.5"
+VERSION="0.0.6"
 # == 自定义配置 ==============================================
 # 设定拦截词,以竖线分割每个拦截词,被拦截的内容会转发给nodered服务器进行处理
 keywords="没有|未知"
@@ -65,7 +65,7 @@ while true;do
       # @todo:
       # 转发asr和res给服务端接口,远端可以处理控制逻辑完成后返回需要播报的TTS文本
       # 2秒连接超时,4秒传输超时
-      tts=`curl -u "$nodered_password" –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content" $nodered_url`
+      tts=`curl -u "$nodered_auth" –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content" $nodered_url`
       echo "== 请求完成 ======"
       echo "$tts"
  
