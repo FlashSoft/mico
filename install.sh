@@ -6,10 +6,8 @@ root=""
 mico_path="${root}/root/mico.sh"
 # 脚本开机启动
 mico_initpath="${root}/etc/init.d/mico_enable"
-mico_rcpath="${root}/etc/rc.d/S96mico_enable"
 mico_tmppath="/tmp"
 rm $mico_initpath
-rm $mico_rcpath
 echo ""
 echo "欢迎使用'小爱拦截器'安装工具 v0.2(2018.10.26)"
 echo ""
