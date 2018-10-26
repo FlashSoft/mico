@@ -96,9 +96,6 @@ awk '{gsub("^res_file=.*", "res_file=\"'${mico_tmppath}'/mibrain/mibrain_respons
 awk '{gsub("^nodered_auth=.*", "nodered_auth=\"'${nodered_auth}'\""); print $0}' > $mico_path
 chmod a+x $mico_path
 
-
-exit
-
 # 部署脚本
 echo "部署启动脚本"
 echo "#!/bin/sh /etc/rc.common
