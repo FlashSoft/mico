@@ -47,10 +47,10 @@ while true;do
 
     # if [ "`echo "$res_content"|grep '"domain": "smartMiot"'`" ];then
     miai_domain=`echo "$res_content"|awk -F '"domain": ' '{print $2}'|awk -F '"' '{print $2}'`
-
-    echo "== 有内容更新 | type: $miai_domain"
-
-    if ([[ ! -z $keywords ]] && [[  ! -z `echo $res_content|awk 'match($0,/'$keywords'/){print 1}'` ]]) || [ "`echo "$res_content"|grep SM_NO_DEVICE_TO_OPERATE_DEVICE_LIST_NOT_EMPTY`" ];then
+    miai_errcode=`echo "$res_content"|awk -F '\"extend\":' '{print $2}'|awk -F '\"code\": ' '{print $2}'|awk -F ',' '($1>200){print $1}'`
+    echo "== 有内容更新 | type: $miai_domain errcode: $miai_errcode"
+    
+    if ([[ ! -z $keywords ]] && [[  ! -z `echo "$res_content"|awk 'match($0,/'$keywords'/){print 1}'` ]]) || [ $miai_errcode ];then
       echo "== 试图停止"
       # 若干循环,直到resume成功一次直接跳出
       seq 1 200 | while read line;do
