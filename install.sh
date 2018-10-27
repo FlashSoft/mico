@@ -19,7 +19,7 @@ echo "==============================================================="
 echo ""
 
 # 环境检测,必须为小爱环境才继续
-# [ -z "`uname -a|grep mico`" ] && echo "当前不是小爱设备,请到小爱上执行此命令" && exit
+[ -z "`uname -a|grep mico`" ] && echo "当前不是小爱设备,请到小爱上执行此命令" && exit
 
 
 echo "[!!!注意] 需要先有NodeRed服务并且提供了/miai这样的get接口(导入论坛提供的流就好)"
@@ -62,8 +62,8 @@ if [ -z "`echo ${header}`" ];then
   echo "验证不通过: NodeRed网址不通"
   exit
 else
-  if [ -z "`echo "${header}" |grep 'HTTP/'|awk '($2==200){print 1}'`" ];then
-    echo "验证不通过: NodeRed接口异常(密码不正确或未部署对应的NodeRed流)"
+  if [[ "`echo $header|awk '{print $2}'`" -eq "401" ]];then
+    echo "验证不通过: NodeRed密码不正确"
     exit
   else
     echo "验证通过"
