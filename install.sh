@@ -1,5 +1,4 @@
 # @author FlashSoft
-# @update 2018.10.26
 root=`pwd`
 root=""
 # 脚本存放地址
@@ -8,25 +7,22 @@ mico_path="${root}/root/mico.sh"
 mico_initpath="${root}/etc/init.d/mico_enable"
 mico_tmppath="/tmp"
 rm $mico_initpath
+echo "==============================================================="
 echo ""
-echo "欢迎使用'小爱拦截器'安装工具 v0.4(2018.10.26)"
+echo "     欢迎使用'小爱拦截器'安装工具 v0.7(2018.10.27)"
 echo ""
-echo "本工具通过拦截小爱的识别词和响应词"
-echo "把拦截的请求转发给NodeRed服务进行自定义设备的操作"
+echo "     本工具通过拦截小爱的识别词和响应词"
+echo "     把拦截的请求转发给NodeRed服务进行自定义设备的操作"
+echo "     论坛地址 https://bbs.hassbian.com/thread-5110-1-1.html"
 echo ""
-
+echo "==============================================================="
+echo ""
 
 # 环境检测,必须为小爱环境才继续
-[ -z "`uname -a|grep mico`" ] && echo "当前不是小爱设备,请到小爱上执行此命令" && exit
+# [ -z "`uname -a|grep mico`" ] && echo "当前不是小爱设备,请到小爱上执行此命令" && exit
 
-echo "请输入响应拦截词,多个拦截词使用|分割,默认值为[未知|没有]:"
-read -p "" keywords
-[ -z "${keywords}" ] && keywords="未知|没有"
 
-echo "请输入响应拦截词的更新频率,单位秒,0为不更新,默认值[0]:"
-read -p "" keywords_update_timeout
-[ -z "${keywords_update_timeout}" ] && keywords_update_timeout=0
-
+echo "[!!!注意] 需要先有NodeRed服务并且提供了/miai这样的get接口(导入论坛提供的流就好)"
 echo "请输入NodeRed服务地址,默认值[http://192.168.1.1:1880/miai]:"
 read -p "" nodered_url
 [ -z "${nodered_url}" ] && nodered_url="http://192.168.1.1:1880/miai"
@@ -36,12 +32,21 @@ echo "格式为 账号:密码"
 read -p "" nodered_auth
 [ -z "${nodered_auth}" ] && nodered_auth=':'
 
+echo "[!!!注意] 从安装器v0.5版本开始,拦截未知设备无需填写拦截词,如果需要拦截特定情况的可以输入"
+echo "请输入响应拦截词,多个拦截词使用|分割,默认值为[空]:"
+read -p "" keywords
+[ -z "${keywords}" ] && keywords=""
+
+echo "请输入响应拦截词的更新频率,单位秒,0为不更新,默认值[0]:"
+read -p "" keywords_update_timeout
+[ -z "${keywords_update_timeout}" ] && keywords_update_timeout=0
+
 echo "==============================================================="
 echo ""
-echo "           响应拦截词: ${keywords}"
-echo "   响应拦截词更新频率: ${keywords_update_timeout}"
 echo "      NodeRed服务地址: ${nodered_url}"
 echo "      NodeRed账号密码: `[ "$nodered_auth" == ":" ] && echo "无密码" || echo "有密码"`"
+echo "           响应拦截词: `[ "$keywords" == "" ] && echo "无" || echo "有"`"
+echo "   响应拦截词更新频率: ${keywords_update_timeout}"
 echo ""
 echo "==============================================================="
 
@@ -50,42 +55,43 @@ read -p "" enterkey
 
 echo "开始验证nodered访问是否通畅"
 echo ""
-header=`curl –connect-timeout 2 -m 4 -sI -u "${nodered_auth}" ${nodered_url}`
+header=`curl –connect-timeout 2 -m 4 -sI -u "${nodered_auth}" ${nodered_url}|head -n 1`
+echo "状态信息: ${header}"
+echo ""
 if [ -z "`echo ${header}`" ];then
   echo "验证不通过: NodeRed网址不通"
   exit
 else
   if [ -z "`echo "${header}" |grep 'HTTP/'|awk '($2==200){print 1}'`" ];then
-    echo "验证不通过: NodeRed接口状态值非200 [可能密码不正确]"
+    echo "验证不通过: NodeRed接口异常(密码不正确或未部署对应的NodeRed流)"
     exit
   else
     echo "验证通过"
   fi
 fi
 
-echo "验证小爱固件版本"
-
 if [ -d "/tmp/mibrain" ];then
-  echo "旧版固件"
+  echo "小爱固件版本: 旧版固件"
 else
   if [ -d "/tmp/mipns/mibrain" ];then
-    mico_tmppath="/tmp/mipns"
-    echo "新版固件"
+    mico_tmppath="/tmp/mipns" 
+    echo "小爱固件版本: 新版固件"
   else
-    echo "未知固件版本"
+    echo "小爱固件版本: 未知固件版本"
     exit
   fi
 fi
 
-
 # 下载远程脚本并检查是否成功
-mico=`curl -s –connect-timeout 4 -m 4 'https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh'`
+now=`date +%s`
+mico=`curl -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh?${now}"`
 # mico=`cat ./mico.sh`
 if [[ -z `echo "${mico}"|awk 'match($0,/VERSION/){print 1}'` ]];then
-  echo "脚本下载不成功,可能你需要买个番茄先"
+  echo "脚本下载不成功,可能你需要个酸酸乳"
   exit
 fi
 
+exit
 # 替换变量并存储
 echo "${mico}" |
 awk '{gsub("^keywords=.*", "keywords=\"'${keywords}'\""); print $0}' |
@@ -109,8 +115,7 @@ stop() {
 }" > $mico_initpath
 chmod a+x $mico_initpath
 $mico_initpath enable
+$mico_initpath stop
 
 echo "安装完毕"
 echo "可以使用/etc/init.d/mico_enable start 启动小爱拦截器"
-echo "可以使用/etc/init.d/mico_enable stop 停止小爱拦截器"
-
