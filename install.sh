@@ -6,7 +6,7 @@ mico_path="${root}/root/mico.sh"
 # 脚本开机启动
 mico_initpath="${root}/etc/init.d/mico_enable"
 mico_tmppath="/tmp"
-rm $mico_initpath
+rm $mico_initpath > /dev/null 2>&1
 echo "==============================================================="
 echo ""
 echo "     欢迎使用'小爱拦截器'安装工具 v0.7(2018.10.27)"
@@ -112,7 +112,7 @@ start() {
 stop() {
   kill \`ps|grep 'sh ${mico_path}'|grep -v grep|awk '{print \$1}'\`
 }" > $mico_initpath
-chmod a+x $mico_initpath
+chmod a+x $mico_initpath > /dev/null 2>&1
 $mico_initpath enable > /dev/null 2>&1
 $mico_initpath stop > /dev/null 2>&1
 
