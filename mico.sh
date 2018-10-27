@@ -77,9 +77,15 @@ while true;do
       if [[ -n "$tts" ]];then
         echo "== 播报TTS | TTS内容: $tts"
         ubus call mibrain text_to_speech "{\"text\":\"$tts\",\"save\":0}" > /dev/null 2>&1
-        # @fixme
-        # 这里的4秒有点瞎扯淡,后续需要修改成判断是否TTS播报完毕
-        sleep 4
+        # 最长20秒TTS播报时间,20秒内如果播报完成跳出
+        seq 1 20 | while read line;do
+          media_type=`ubus -t 1 call mediaplayer player_get_play_status|awk -F 'media_type' '{print $2}'|cut -c 5`
+          if [ "$media_type" -ne "1" ];then
+            echo "== 播报TTS结束"
+            break
+          fi
+          sleep 1
+        done
       fi
  
       # 如果之前音乐是播放的则接着播放
