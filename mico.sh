@@ -70,7 +70,7 @@ while true;do
       # @todo:
       # 转发asr和res给服务端接口,远端可以处理控制逻辑完成后返回需要播报的TTS文本
       # 2秒连接超时,4秒传输超时
-      tts=`curl -u "$nodered_auth" –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content" $nodered_url`
+      tts=`curl --insecure -u "$nodered_auth" –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content" $nodered_url`
       echo "== 请求完成"
 
       # 如果远端返回内容不为空则用TTS播报之
@@ -98,7 +98,7 @@ while true;do
     step=`expr $now - $last_time`
     # 根据设定时间间隔获取更新词
     if [[ "$step" -gt "$keywords_update_timeout" ]];then
-        keywords=`curl -u "$nodered_auth" –connect-timeout 2 -m 4 -s $nodered_url`
+        keywords=`curl --insecure -u "$nodered_auth" –connect-timeout 2 -m 4 -s $nodered_url`
         echo "== 更新关键词 | 关键词内容: $keywords"
         last_time=`date +%s`
     fi

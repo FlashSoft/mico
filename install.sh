@@ -55,7 +55,7 @@ read -p "" enterkey
 
 echo "开始验证nodered访问是否通畅"
 echo ""
-header=`curl –connect-timeout 2 -m 4 -sI -u "${nodered_auth}" ${nodered_url}|head -n 1`
+header=`curl --insecure –connect-timeout 2 -m 4 -sI -u "${nodered_auth}" ${nodered_url}|head -n 1`
 echo "状态信息: ${header}"
 echo ""
 if [ -z "`echo ${header}`" ];then
@@ -84,7 +84,7 @@ fi
 
 # 下载远程脚本并检查是否成功
 now=`date +%s`
-mico=`curl -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh?${now}"`
+mico=`curl --insecure -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh?${now}"`
 # mico=`cat ./mico.sh`
 if [[ -z `echo "${mico}"|awk 'match($0,/FlashSoft/){print 1}'` ]];then
   echo "脚本下载不成功,可能你需要个酸酸乳"
