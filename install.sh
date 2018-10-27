@@ -85,6 +85,7 @@ fi
 # 下载远程脚本并检查是否成功
 now=`date +%s`
 mico=`curl -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh?${now}"`
+echo "$mico"
 # mico=`cat ./mico.sh`
 if [[ -z `echo "${mico}"|awk 'match($0,/VERSION/){print 1}'` ]];then
   echo "脚本下载不成功,可能你需要个酸酸乳"
