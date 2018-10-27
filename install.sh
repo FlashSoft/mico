@@ -91,7 +91,6 @@ if [[ -z `echo "${mico}"|awk 'match($0,/VERSION/){print 1}'` ]];then
   exit
 fi
 
-exit
 # 替换变量并存储
 echo "${mico}" |
 awk '{gsub("^keywords=.*", "keywords=\"'${keywords}'\""); print $0}' |
