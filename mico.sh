@@ -59,18 +59,16 @@ while true;do
   # 计算md5值 
   new_md5=`md5sum ${res_file} | awk '{print $1}'`
   # 如果是第一次,就赋值比较用的md5
-  # [ -z ${res_md5} ] && res_md5=${new_md5}
+  [ -z ${res_md5} ] && res_md5=${new_md5}
   # 如果md5不等则文件变化
   if [[ ${new_md5} != ${res_md5} ]];then
     # 记录md5变化后结果
     res_md5=${new_md5}
- 
     
     # 获取asr内容
     asr_content=`cat ${asr_file}`
     # 获取res内容
     res_content=`cat ${res_file}`
-
 
     miai_domain=`echo "${res_content}"|awk -F '"domain": ' '{print $2}'|awk -F '"' '{print $2}'`
     miai_errcode=`echo "${res_content}"|awk -F '\"extend\":' '{print $2}'|awk -F '\"code\": ' '{print $2}'|awk -F ',' '($1>200){print $1}'`
@@ -83,8 +81,7 @@ while true;do
       echo "== 试图停止"
       # 若干循环,直到resume成功一次直接跳出
       seq 1 200 | while read line;do
-        # code=`ubus call mediaplayer player_play_operation {\"action\":\"resume\"}|awk -F 'code":' '{print $2}'`
-        code="0"
+        code=`ubus call mediaplayer player_play_operation {\"action\":\"resume\"}|awk -F 'code":' '{print $2}'`
         if [[ "${code}" -eq "0" ]];then
           echo "== 停止成功"
           break
@@ -93,16 +90,14 @@ while true;do
       done
  
       # 记录播放状态并暂停,方便在HA服务器处理逻辑的时候不会插播音乐,0为未播放,1为播放中,2为暂停
-      # play_status=`ubus -t 1 call mediaplayer player_get_play_status | awk -F 'status' '{print $2}' | cut -c 5`
-      play_status="1"
+      play_status=`ubus -t 1 call mediaplayer player_get_play_status | awk -F 'status' '{print $2}' | cut -c 5`
       
       ubus call mediaplayer player_play_operation {\"action\":\"pause\"} > /dev/null 2>&1
  
       # @todo:
       # 转发asr和res给服务端接口,远端可以处理控制逻辑完成后返回需要播报的TTS文本
       # 2秒连接超时,4秒传输超时
-      # tts=`curl --insecure -u "$nodered_auth" –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content" $nodered_url`
-      tts="1"
+      tts=`curl --insecure -u "$nodered_auth" –connect-timeout 2 -m 4 -s --data-urlencode "asr=$asr_content" --data-urlencode "res=$res_content" $nodered_url`
       echo "== 请求完成"
 
       # 如果远端返回内容不为空则用TTS播报之
@@ -111,8 +106,7 @@ while true;do
         ubus call mibrain text_to_speech "{\"text\":\"${tts}\",\"save\":0}" > /dev/null 2>&1
         # 最长20秒TTS播报时间,20秒内如果播报完成跳出
         seq 1 20 | while read line;do
-          # media_type=`ubus -t 1 call mediaplayer player_get_play_status|awk -F 'media_type' '{print $2}'|cut -c 5`
-          media_type="1"
+          media_type=`ubus -t 1 call mediaplayer player_get_play_status|awk -F 'media_type' '{print $2}'|cut -c 5`
           if [ "${media_type}" -ne "1" ];then
             echo "== 播报TTS结束"
             break
@@ -142,6 +136,5 @@ while true;do
         last_time=`date +%s`
     fi
   fi
-  # usleep 10
-  sleep 1
+  usleep 10
 done
