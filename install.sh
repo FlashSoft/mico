@@ -1,5 +1,5 @@
 # @author FlashSoft
-root=`pwd`
+# root=`pwd`
 root=""
 # 脚本存放地址
 mico_path="${root}/root/mico.sh"
@@ -9,7 +9,7 @@ mico_tmppath="/tmp"
 rm $mico_initpath > /dev/null 2>&1
 echo "==============================================================="
 echo ""
-echo "     欢迎使用'小爱拦截器'安装工具 v0.8(2018.10.27)"
+echo "     欢迎使用'小爱拦截器'安装工具 v0.9(2018.10.31)"
 echo ""
 echo "     本工具通过拦截小爱的识别词和响应词"
 echo "     把拦截的请求转发给NodeRed服务进行自定义设备的操作"
@@ -23,19 +23,24 @@ echo ""
 
 
 echo "[!!!注意] 需要先有NodeRed服务并且提供了/miai这样的get接口(导入论坛提供的流就好)"
-echo "请输入NodeRed服务地址,默认值[http://192.168.1.1:1880/miai]:"
+echo "请输入NodeRed服务地址,默认值[http://192.168.1.1:1880]:"
 read -p "" nodered_url
-[ -z "${nodered_url}" ] && nodered_url="http://192.168.1.1:1880/miai"
+[ -z "${nodered_url}" ] && nodered_url="http://192.168.1.1:1880"
 
 echo "请输入你的NodeRed的账号和密码,如果没有密码请直接回车:"
 echo "格式为 账号:密码"
 read -p "" nodered_auth
 [ -z "${nodered_auth}" ] && nodered_auth=':'
 
-echo "[!!!注意] 从安装器v0.5版本开始,拦截未知设备无需填写拦截词,如果需要拦截特定情况的可以输入"
-echo "请输入响应拦截词,多个拦截词使用|分割,默认值为[空]:"
-read -p "" keywords
-[ -z "${keywords}" ] && keywords=""
+echo "[!!!注意] asr拦截词为你对小爱自己说的话"
+echo "请输入asr拦截词,多个拦截词使用|分割,默认值为[空]:"
+read -p "" asr_keywords
+[ -z "${asr_keywords}" ] && asr_keywords=""
+
+echo "[!!!注意] res拦截词为小爱对你的响应内容"
+echo "请输入res拦截词,多个拦截词使用|分割,默认值为[空]:"
+read -p "" res_keywords
+[ -z "${res_keywords}" ] && res_keywords=""
 
 echo "请输入响应拦截词的更新频率,单位秒,0为不更新,默认值[0]:"
 read -p "" keywords_update_timeout
@@ -44,9 +49,10 @@ read -p "" keywords_update_timeout
 echo "==============================================================="
 echo ""
 echo "      NodeRed服务地址: ${nodered_url}"
-echo "      NodeRed账号密码: `[ "$nodered_auth" == ":" ] && echo "无密码" || echo "有密码"`"
-echo "           响应拦截词: `[ "$keywords" == "" ] && echo "无" || echo "有"`"
-echo "   响应拦截词更新频率: ${keywords_update_timeout}"
+echo "      NodeRed账号密码: `[ "${nodered_auth}" == ":" ] && echo "无密码" || echo "有密码"`     "
+echo "            asr拦截词: `[ "${asr_keywords}" == "" ] && echo "无拦截词" || echo ${asr_keywords}`    "
+echo "            res拦截词: `[ "${res_keywords}" == "" ] && echo "无拦截词" || echo ${res_keywords}`    "
+echo "       拦截词更新频率: `[ "${keywords_update_timeout}" == "0" ] && echo "不更新" || echo ${keywords_update_timeout}`    "
 echo ""
 echo "==============================================================="
 
@@ -84,7 +90,7 @@ fi
 
 # 下载远程脚本并检查是否成功
 now=`date +%s`
-mico=`curl --insecure -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/master/mico.sh?${now}"`
+mico=`curl --insecure -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/dev/mico.sh?${now}"`
 # mico=`cat ./mico.sh`
 if [[ -z `echo "${mico}"|awk 'match($0,/FlashSoft/){print 1}'` ]];then
   echo "脚本下载不成功,可能你需要个酸酸乳"
@@ -93,13 +99,15 @@ fi
 
 # 替换变量并存储
 echo "${mico}" |
-awk '{gsub("^keywords=.*", "keywords=\"'${keywords}'\""); print $0}' |
+awk '{gsub("^asr_keywords=.*", "asr_keywords=\"'${asr_keywords}'\""); print $0}' |
+awk '{gsub("^res_keywords=.*", "res_keywords=\"'${res_keywords}'\""); print $0}' |
 awk '{gsub("^keywords_update_timeout=.*", "keywords_update_timeout='${keywords_update_timeout}'"); print $0}' |
 awk '{gsub("^nodered_url=.*", "nodered_url=\"'${nodered_url}'\""); print $0}' |
 awk '{gsub("^asr_file=.*", "asr_file=\"'${mico_tmppath}'/mibrain/mibrain_asr.log\""); print $0}' |
 awk '{gsub("^res_file=.*", "res_file=\"'${mico_tmppath}'/mibrain/mibrain_response.log\""); print $0}' |
 awk '{gsub("^nodered_auth=.*", "nodered_auth=\"'${nodered_auth}'\""); print $0}' > $mico_path
 chmod a+x $mico_path
+
 
 # 部署脚本
 echo "部署启动脚本"

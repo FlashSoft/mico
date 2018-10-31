@@ -2,7 +2,7 @@
 # == 自定义配置 ==============================================
 
 # 配置nodered的接收地址
-nodered_url="https://node.flashsoft.cn"
+nodered_url=""
 
 # 设定asr拦截词,以竖线分割每个拦截词
 asr_keywords=""
