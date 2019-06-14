@@ -9,7 +9,7 @@ mico_tmppath="/tmp"
 rm $mico_initpath > /dev/null 2>&1
 echo "==============================================================="
 echo ""
-echo "     欢迎使用'小爱拦截器'安装工具 v0.8(2018.10.27)"
+echo "     欢迎使用'小爱拦截器'安装工具 v0.9(2019.06.14)"
 echo ""
 echo "     本工具通过拦截小爱的识别词和响应词"
 echo "     把拦截的请求转发给NodeRed服务进行自定义设备的操作"
@@ -97,7 +97,7 @@ awk '{gsub("^keywords=.*", "keywords=\"'${keywords}'\""); print $0}' |
 awk '{gsub("^keywords_update_timeout=.*", "keywords_update_timeout='${keywords_update_timeout}'"); print $0}' |
 awk '{gsub("^nodered_url=.*", "nodered_url=\"'${nodered_url}'\""); print $0}' |
 awk '{gsub("^asr_file=.*", "asr_file=\"'${mico_tmppath}'/mibrain/mibrain_asr.log\""); print $0}' |
-awk '{gsub("^res_file=.*", "res_file=\"'${mico_tmppath}'/mibrain/mibrain_response.log\""); print $0}' |
+awk '{gsub("^res_file=.*", "res_file=\"'${mico_tmppath}'/mibrain/mibrain_txt_RESULT_NLP.log\""); print $0}' |
 awk '{gsub("^nodered_auth=.*", "nodered_auth=\"'${nodered_auth}'\""); print $0}' > $mico_path
 chmod a+x $mico_path
 
