@@ -11,7 +11,7 @@ keywords_update_timeout=0
 # == /自定义配置========================================
  
 asr_file="/tmp/mipns/mibrain/mibrain_asr.log"
-res_file="/tmp/mipns/mibrain/mibrain_response.log"
+res_file="/tmp/mipns/mibrain/mibrain_txt_RESULT_NLP.log"
 nodered_auth="ben:benbendediannao"
  
 # 解决可能存在第一次文件不存在问题
@@ -46,8 +46,8 @@ while true;do
     # 如果拦截词不为空,且匹配到了拦截词则试图拦截
 
     # if [ "`echo "$res_content"|grep '"domain": "smartMiot"'`" ];then
-    miai_domain=`echo "$res_content"|awk -F '"domain": ' '{print $2}'|awk -F '"' '{print $2}'`
-    miai_errcode=`echo "$res_content"|awk -F '\"extend\":' '{print $2}'|awk -F '\"code\": ' '{print $2}'|awk -F ',' '($1>200){print $1}'`
+    miai_domain=`echo "$res_content"|awk -F '"domain":' '{print $2}'|awk -F '"' '{print $2}'`
+    miai_errcode=`echo "$res_content"|awk -F '\"extend\":' '{print $2}'|awk -F '\"code\":' '{print $2}'|awk -F ',' '($1>200){print $1}'`
     echo "== 有内容更新 | type: $miai_domain errcode: $miai_errcode"
     
     if ([[ ! -z $keywords ]] && [[  ! -z `echo "$res_content"|awk 'match($0,/'$keywords'/){print 1}'` ]]) || [ $miai_errcode ];then
