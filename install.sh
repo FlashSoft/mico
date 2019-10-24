@@ -21,13 +21,24 @@ echo ""
 # 环境检测,必须为小爱环境才继续
 [ -z "`uname -a|grep mico`" ] && echo "当前不是小爱设备,请到小爱上执行此命令" && exit
 
+echo -e "[!!!注意] 请确认你使用的是Hassio!"
+echo "请输入Hassio选择<0:不是Hassio|1:我是Hassio>,默认值[0]:"
+read -p "" is_hassio
+[ -z "${is_hassio}" ] && is_hassio="0"
 
-echo "[!!!注意] 需要先有NodeRed服务并且提供了/miai这样的get接口(导入论坛提供的流就好)"
-echo "请输入NodeRed服务地址,默认值[http://192.168.1.1:1880]:"
-read -p "" nodered_url
-[ -z "${nodered_url}" ] && nodered_url="http://192.168.1.1:1880"
+if [ "${is_hassio}" -eq "0" ];then
+  echo "[!!!注意] 需要先有NodeRed服务并且提供了/miai这样的get接口(导入论坛提供的流就好)"
+  echo "请输入NodeRed服务地址,默认值[http://192.168.1.1:1880/miai]:"
+  read -p "" nodered_url
+  [ -z "${nodered_url}" ] && nodered_url="http://192.168.1.1:1880/miai"
+else
+  echo -e "[!!!注意] 需要先有NodeRed服务并且提供了/miai这样的get接口\n(hassio的get/post节点都相对于endpoint!)"
+  echo "请输入NodeRed服务地址,默认值[http://192.168.1.1:1880/endpoint/miai]:"
+  read -p "" nodered_url
+  [ -z "${nodered_url}" ] && nodered_url="http://192.168.1.1:1880/endpoint/miai"
+fi
 
-echo "请输入你的NodeRed的账号和密码,如果没有密码请直接回车:"
+echo "请输入你的NodeRed的 <http_node> 的账号和密码,如果没有密码请直接回车:"
 echo "格式为 账号:密码"
 read -p "" nodered_auth
 [ -z "${nodered_auth}" ] && nodered_auth=':'
@@ -90,7 +101,11 @@ fi
 
 # 下载远程脚本并检查是否成功
 now=`date +%s`
-mico=`curl --insecure -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/dev/mico.sh?${now}"`
+if [ "${is_hassio}" -eq "0" ];then
+  mico=`curl --insecure -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/FlashSoft/mico/dev/mico.sh?${now}"`
+else
+  mico=`curl --insecure -s –connect-timeout 4 -m 4 "https://raw.githubusercontent.com/Lisheng2016/mico/dev/mico_hassio.sh?${now}"
+fi
 # mico=`cat ./mico.sh`
 if [[ -z `echo "${mico}"|awk 'match($0,/FlashSoft/){print 1}'` ]];then
   echo "脚本下载不成功,可能你需要个酸酸乳"
@@ -104,7 +119,7 @@ awk '{gsub("^res_keywords=.*", "res_keywords=\"'${res_keywords}'\""); print $0}'
 awk '{gsub("^keywords_update_timeout=.*", "keywords_update_timeout='${keywords_update_timeout}'"); print $0}' |
 awk '{gsub("^nodered_url=.*", "nodered_url=\"'${nodered_url}'\""); print $0}' |
 awk '{gsub("^asr_file=.*", "asr_file=\"'${mico_tmppath}'/mibrain/mibrain_asr.log\""); print $0}' |
-awk '{gsub("^res_file=.*", "res_file=\"'${mico_tmppath}'/mibrain/mibrain_response.log\""); print $0}' |
+awk '{gsub("^res_file=.*", "res_file=\"'${mico_tmppath}'/mibrain/mibrain/mibrain_txt_RESULT_NLP.log\""); print $0}' |
 awk '{gsub("^nodered_auth=.*", "nodered_auth=\"'${nodered_auth}'\""); print $0}' > $mico_path
 chmod a+x $mico_path
 
